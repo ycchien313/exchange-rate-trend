@@ -19,6 +19,7 @@
     
     <title>外幣匯率</title>
   </head>
+  
   <body>
     <!-- 顯示匯率 -->
     <div class ="col-12">
@@ -30,11 +31,11 @@
     </div>
 
 	
-	<!-- 顯示圖表 -->
+	<!-- 顯示圖表(Line Chart) -->
 	<div class ="col-md-6 offset-md-3">
 	   <div class="card">
 	       <div class="card-body">
-	           <h1>Line Chart <button class="btn btn-success" onclick="updateChart()">Update</button></h1><hr>
+	           <h1>${showLineChartTitle} <button class="btn btn-success" onclick="updateChart()">更新</button></h1><hr>
 	           <canvas id="lineChart"></canvas>
 	       </div>
 	   </div>
@@ -43,8 +44,8 @@
 	
     <script>
     var times, buyRates, sellRates;
-    //get rates's times
     
+    //GET Times of Rates
     function getTimes(){
     	$.ajax({
     		type: "GET",
@@ -52,12 +53,8 @@
     		dataType: "json",
     		async: false,
     		success: function(data){
-    			//var json = JSON.stringify(data);
+    			//var json = JSON.stringify(data);   //轉為字串
     			//var json2 = JSON.parse(data);
-    			//msg = Object.keys(data).map(function(key) {
-    				//return [Number(key), data[key]];
-    			//});
-    			//alert(msg);
     			times = data;
     		},
     		error: function(){
@@ -65,27 +62,9 @@
     		}
     	});  
     }
-    /*
-    $.ajax({
-        type: "GET",
-        url: "/IntumitAssignment/getTimes",
-        dataType: "json",
-        async: false,
-        success: function(data){
-            //var json = JSON.stringify(data);
-            //var json2 = JSON.parse(data);
-            //msg = Object.keys(data).map(function(key) {
-                //return [Number(key), data[key]];
-            //});
-            //alert(msg);
-            times = data;
-        },
-        error: function(){
-            alert("error");
-        }
-    });  */
 
-    //get rates's buyRates
+
+    //GET BuyRates of Rates
     function getBuyRates(){
     	$.ajax({
             type: "GET",
@@ -100,21 +79,9 @@
             }
         });
     }
-    /*
-    $.ajax({
-    	type: "GET",
-    	url: "/IntumitAssignment/getBuyRates",
-    	dataType: "json",
-    	async: false,
-        success: function(data){
-        	buyRates = data;
-        },
-        error: function(){
-            alert("error");
-        }
-    });*/
+
     
-    //get rates's sellRates
+    //GET SellRates of Rates
     function getSellRates(){
     	$.ajax({
             type: "GET",
@@ -129,61 +96,16 @@
             }
         });
     }
-    /*
-    $.ajax({
-        type: "GET",
-        url: "/IntumitAssignment/getSellRates",
-        dataType: "json",
-        async: false,
-        success: function(data){
-            sellRates = data;
-        },
-        error: function(){
-            alert("error");
-        }
-    });*/
-    
 
-    /*
-    getTimes();
-    getBuyRates();
-    getSellRates();
-    var ctx = document.getElementById('lineChart').getContext('2d');
-    var labels = times;     //ex. labels = ["loading", "complete"]
-    var datas = buyRates;   //ex. buyRates = [10, 200]
-    var chart = new Chart(ctx, {
-        // The type of chart we want to create
-        type: 'line',
-
-        // The data for our dataset
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Buy Rate',
-                fill: false,
-                borderColor: ["rgba(247,163,92,0.25"],
-                data: datas
-            },{
-                label: 'Sell Rate',
-                fill: false,
-                borderColor: ["#00FFFF"],
-                data: sellRates
-            }]
-        },
-
-        // Configuration options go here
-        options: {}
-    });*/
-    
-    
+    //更新 圖表
     function updateChart() {
-        //chart.data.datasets[0].data = [50, 50];
         getTimes();
         getBuyRates();
         getSellRates();
         var ctx = document.getElementById('lineChart').getContext('2d');
         var labels = times;     //ex. labels = ["loading", "complete"]
-        var datas = buyRates;   //ex. buyRates = [10, 200]
+        var datas_BuyRates = buyRates;   //ex. buyRates = [10, 200]
+        var datas_SellRates = sellRates;
         var chart = new Chart(ctx, {
             // The type of chart we want to create
             type: 'line',
@@ -192,19 +114,17 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Buy Rate',
+                    label: '買匯',
                     fill: false,
                     borderColor: ["rgba(247,163,92,0.25"],
                     pointRadius: 0.5,
-                    //pointBorderWidth: 0.1,
-                    data: datas
+                    data: datas_BuyRates
                 },{
-                    label: 'Sell Rate',
+                    label: '賣匯',
                     fill: false,
                     borderColor: ["#00FFFF"],
                     pointRadius: 0.5,
-                    //pointBorderWidth: 0.1,
-                    data: sellRates
+                    data: datas_SellRates
                 }]
             },
     
@@ -214,15 +134,6 @@
     }
     
     updateChart();
-    
-    /*
-    function updateChart() {
-        //chart.data.datasets[0].data = [50, 50];
-        getTimes();
-	    getBuyRates();
-	    getSellRates();
-        chart.update();
-    }*/
     </script>
 
     <!-- Optional JavaScript -->

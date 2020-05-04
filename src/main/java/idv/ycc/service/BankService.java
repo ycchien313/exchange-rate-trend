@@ -14,14 +14,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class BankService {
 
-    //取得 URL API
+    /*
+     * 方法： 
+     * getExchangeRateAPI() : 取得轉換匯率API之URL (Exchange Rate API)
+     * createParentObject() : 創建 POST 給 API 的參數
+     * getLatestRate() : 取得最新 ExchangeRateAPI 的 Rate Object Value (Time、BuyRate、SellRate)
+     * getRatesObjectTime() : 取得 POST給API後 回傳的 JSON資料，並擷取 time 的部分
+     * getRatesObjectBuyRate() : 取得 POST給API後 回傳的 JSON資料，並擷取 BuyRate 的部分
+     * getRatesObjectSellRate() : 取得 POST給API後 回傳的 JSON資料，並擷取 SellRate 的部分
+     * setCurrencyTitle() : 設定 currencyTitle 的中文，用於${showCurrencyTitle}、${showLineChartTitle} (From: exchangerate.jsp)
+     * 
+     * 測試用資料：
+     * urlBank = "https://www.esunbank.com.tw/bank/personal/deposit/rate/forex/exchange-rate-chart?Currency=USD/TWD";
+     * urlBank = "https://www.esunbank.com.tw/bank/personal/deposit/rate/forex/exchange-rate-chart?Currency=HKD/TWD";
+     */
+    
+    //取得 URL of API
     public String getExchangeRateAPI() {
         try {
             int urlIndex, beginIndex, endIndex;
             String urlBank, urlApi;
-            //urlBank = "https://www.esunbank.com.tw/bank/personal/deposit/rate/forex/exchange-rate-chart?Currency=USD/TWD";
             urlBank = "https://www.esunbank.com.tw/bank/personal/deposit/rate/forex/exchange-rate-chart?Currency=CNY/TWD";
-            //urlBank = "https://www.esunbank.com.tw/bank/personal/deposit/rate/forex/exchange-rate-chart?Currency=HKD/TWD";
+
             //解析 URL
             Document document = Jsoup.connect(urlBank).get();
             //查詢 script 標籤元素
@@ -50,13 +64,13 @@ public class BankService {
             }
             
         } catch (Exception e) {
-            // TODO: handle exception
             e.printStackTrace();
         }
         
         return null;
     }
 
+    
     //創建 POST parent object 
     public String createParentObject(String unit) {
 
@@ -93,15 +107,12 @@ public class BankService {
         return postParentObject;
     }
 
-    /*
+    
     //取得最新 ExchangeRateAPI 的 Rate Object Value
     public String[] getLatestRate(String exchangeRateApiResponse) {
         ObjectMapper objectMapper = new ObjectMapper();
-        //objectMapper.setSerializationInclusion(Include.NON_NULL); //不顯示Value為Null之Key
-        //objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-        //objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT);
-        //objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true); //不受Jackson強制轉換大小寫
+        //objectMapper.setSerializationInclusion(Include.NON_NULL); //不顯示Value為Null之Key
         
         try {
             //JSON to Java
@@ -112,60 +123,26 @@ public class BankService {
             System.out.println("Rates Object Size: " + rateSize);
             
             String[] ratesObjectValues = new String[3];
-
+            ratesObjectValues[0] = exchangeRateApiResponseObjectService.getD().getRates().get(rateSize - 1).getTime();
+            ratesObjectValues[1] = exchangeRateApiResponseObjectService.getD().getRates().get(rateSize - 1).getBuyRate();
+            ratesObjectValues[2] = exchangeRateApiResponseObjectService.getD().getRates().get(rateSize - 1).getSellRate();
             return ratesObjectValues;
             
-                   
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }*/
-    
-    
-    //取得 ExchangeRateAPI 的 Rate Object Value
-    public String[][] getRatesObjectValue(String exchangeRateApiResponse) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        //objectMapper.setSerializationInclusion(Include.NON_NULL); //不顯示Value為Null之Key
-        //objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-        //objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT);
-        //objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true); //不受Jackson強制轉換大小寫
-        
-        try {
-            //JSON to Java
-            ExchangeRateApiResponseObjectService exchangeRateApiResponseObjectService = 
-                    objectMapper.readValue(exchangeRateApiResponse, ExchangeRateApiResponseObjectService.class);
-            
-            final int rateSize = exchangeRateApiResponseObjectService.getD().getRates().size();
-            System.out.println("Rates Object Size: " + rateSize);
-            
+            /*  取得 Rates Object 所有 values
             String[][] ratesObjectValues = new String[rateSize][3];
-
             for (int i = 0; i < rateSize; i++) {
                 ratesObjectValues[i][0] = exchangeRateApiResponseObjectService.getD().getRates().get(rateSize - 1).getTime();
                 ratesObjectValues[i][1] = exchangeRateApiResponseObjectService.getD().getRates().get(rateSize - 1).getBuyRate();
                 ratesObjectValues[i][2] = exchangeRateApiResponseObjectService.getD().getRates().get(rateSize - 1).getSellRate();
             }
-            return ratesObjectValues;
-            
-            /*
-            String[] times = new String[rateSize];
-            String[] buyRates = new String[rateSize];
-            String[] sellRates = new String[rateSize];
-            for (int i = 0; i < rateSize; i++) {
-                times[i] = exchangeRateApiResponseObjectService.getD().getRates().get(i).getTime();
-                buyRates[i] = exchangeRateApiResponseObjectService.getD().getRates().get(i).getBuyRate();
-                sellRates[i] = exchangeRateApiResponseObjectService.getD().getRates().get(i).getSellRate();
-                
-            }*/
-            //return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchangeRateApiResponseObjectService);
-                    
+            return ratesObjectValues;*/
+                   
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
+    
     
     //取得 Rates Object's Time
     public String[] getRatesObjectTime(String exchangeRateApiResponse) {
@@ -190,6 +167,7 @@ public class BankService {
         }
     }
     
+    
     //取得 Rates Object's BuyRate
     public String[] getRatesObjectBuyRate(String exchangeRateApiResponse) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -212,6 +190,7 @@ public class BankService {
             return null;
         }
     }
+    
     
     //取得 Rates Object's BuyRate
     public String[] getRatesObjectSellRate(String exchangeRateApiResponse) {

@@ -2,7 +2,6 @@ package idv.ycc.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -11,7 +10,7 @@ import idv.ycc.service.RestfulService;
 
 @RestController
 public class ExchangeRateController {
-    String exchangeRateApiResponse = null;
+    String exchangeRateApiResponse = null;  //JSON 資料，From: Exchange Rate API
     
     /*
      * 方法： 
@@ -35,8 +34,7 @@ public class ExchangeRateController {
         final String exchangeRateAPI = bankService.getExchangeRateAPI();
         String currencyTitle = null;
         String postParentObject = null;
-        //String[] rates = null;
-        String[][] rates = null;
+        String[] rates = null;
         
         if (exchangeRateAPI != null) {
             //創建要 POST 給 API 的參數並回傳JSON
@@ -48,16 +46,16 @@ public class ExchangeRateController {
             System.out.println("Exchange Rate Api Response: " + exchangeRateApiResponse);
             
             //取得API response的 Rates Object Value (Time, buyRate, sellRate)
-            rates = bankService.getRatesObjectValue(exchangeRateApiResponse);
-            //rates = 
+            rates = bankService.getLatestRate(exchangeRateApiResponse);
             
             //設定 Currency Title
             currencyTitle = bankService.setCurrencyTitle(unit);
             
             ModelAndView mv = new ModelAndView("exchangerate");
             mv.addObject("showCurrencyTitle", currencyTitle + "最新現金匯率");
-            mv.addObject("showBuyRate", "買入：" + rates[rates.length - 1][1]);
-            mv.addObject("showSellRate", "賣出：" + rates[rates.length - 1][2]);
+            mv.addObject("showBuyRate", "買入：" + rates[1]);
+            mv.addObject("showSellRate", "賣出：" + rates[2]);
+            mv.addObject("showLineChartTitle", currencyTitle + "匯率");
             return mv;
         }
         else {
@@ -67,9 +65,9 @@ public class ExchangeRateController {
         }
     }
     
+    
     //取得Rates Times 回傳給Ajax (exchangerate.jsp) 
     @RequestMapping(value="/getTimes")
-    @ResponseBody
     public String[] getTimes() {
         //String[] time = {"aaa", "bbb"};
         String[] times = null;
@@ -81,9 +79,9 @@ public class ExchangeRateController {
         return times;
     }
     
+    
     //取得Rates BuyRates 回傳給Ajax (exchangerate.jsp)
     @RequestMapping(value = "/getBuyRates")
-    @ResponseBody
     public String[] getBuyRates() {
         String[] buyRates = null;
         if (exchangeRateApiResponse != null) {
@@ -94,9 +92,9 @@ public class ExchangeRateController {
         return buyRates;
     }
 
+    
     //取得Rates SellRates 回傳給Ajax(exchangerate.jsp) 
     @RequestMapping(value = "/getSellRates")
-    @ResponseBody
     public String[] getSellRates() {
         String[] sellRates = null;
         if (exchangeRateApiResponse != null) {

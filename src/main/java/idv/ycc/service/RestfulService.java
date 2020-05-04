@@ -57,7 +57,7 @@ public class RestfulService {
             StringBuilder response = new StringBuilder();
             String responseLine = null;
             while ((responseLine = buf.readLine()) != null) {
-                responseLine = jsonFormat(responseLine);
+                responseLine = jsonFormat(responseLine);    //得到的有斜線，要進行格式化
                 response.append(responseLine.trim());   //將responseLine 加至response
             }
             is.close();
